@@ -1,0 +1,28 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "echo",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-std=c++17",
+                "-fdiagnostics-color=always",
+                "-Wall",
+                "-g",
+                "-I${workspaceFolder}/include",
+                "-L${workspaceFolder}/lib",
+                "${workspaceFolder}/src/glad.c",
+                "${workspaceFolder}/src/*.cpp",
+                "${workspaceFolder}/lib/libglfw.3.dylib",
+                "-o",
+                "${workspaceFolder}/main.exe",
+                "-Wl,-rpath,@executable_path/lib",
+                "-framework",
+                "OpenGL"
+            ],
+        }
+    ]
+}
