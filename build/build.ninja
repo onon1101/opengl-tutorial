@@ -50,7 +50,7 @@ cmake_ninja_workdir = /Users/chenshiang/Desktop/dev/opengl-tutorial/build/
 build cmake_object_order_depends_target_OpenGL_Tutorial: phony || .
 
 build CMakeFiles/OpenGL_Tutorial.dir/src/glad.c.o: C_COMPILER__OpenGL_Tutorial_unscanned_Debug /Users/chenshiang/Desktop/dev/opengl-tutorial/src/glad.c || cmake_object_order_depends_target_OpenGL_Tutorial
-  DEFINES = -DSOURCE_DIR=\"/Users/chenshiang/Desktop/dev/opengl-tutorial/src\"
+  DEFINES = -DSOURCE_DIR=\"/Users/chenshiang/Desktop/dev/opengl-tutorial/src/\"
   DEP_FILE = CMakeFiles/OpenGL_Tutorial.dir/src/glad.c.o.d
   FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -fcolor-diagnostics -Wall -g
   INCLUDES = -I/Users/chenshiang/Desktop/dev/opengl-tutorial/include
@@ -58,7 +58,7 @@ build CMakeFiles/OpenGL_Tutorial.dir/src/glad.c.o: C_COMPILER__OpenGL_Tutorial_u
   OBJECT_FILE_DIR = CMakeFiles/OpenGL_Tutorial.dir/src
 
 build CMakeFiles/OpenGL_Tutorial.dir/src/main.cpp.o: CXX_COMPILER__OpenGL_Tutorial_unscanned_Debug /Users/chenshiang/Desktop/dev/opengl-tutorial/src/main.cpp || cmake_object_order_depends_target_OpenGL_Tutorial
-  DEFINES = -DSOURCE_DIR=\"/Users/chenshiang/Desktop/dev/opengl-tutorial/src\"
+  DEFINES = -DSOURCE_DIR=\"/Users/chenshiang/Desktop/dev/opengl-tutorial/src/\"
   DEP_FILE = CMakeFiles/OpenGL_Tutorial.dir/src/main.cpp.o.d
   FLAGS = -g -std=gnu++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -fcolor-diagnostics -Wall -g
   INCLUDES = -I/Users/chenshiang/Desktop/dev/opengl-tutorial/include

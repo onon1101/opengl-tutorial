@@ -84,7 +84,7 @@
 			[
 				{
 					"backtrace" : 5,
-					"define" : "SOURCE_DIR=\"/Users/chenshiang/Desktop/dev/opengl-tutorial/src\""
+					"define" : "SOURCE_DIR=\"/Users/chenshiang/Desktop/dev/opengl-tutorial/src/\""
 				}
 			],
 			"includes" : 
@@ -119,7 +119,7 @@
 			[
 				{
 					"backtrace" : 5,
-					"define" : "SOURCE_DIR=\"/Users/chenshiang/Desktop/dev/opengl-tutorial/src\""
+					"define" : "SOURCE_DIR=\"/Users/chenshiang/Desktop/dev/opengl-tutorial/src/\""
 				}
 			],
 			"includes" : 

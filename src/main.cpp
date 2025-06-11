@@ -5,6 +5,9 @@ GLFW 會用到 opengl 的東西，因此需要先導入 glad。
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
 
 void framebuffer_size_callback(GLFWwindow* window, int witdh, int height);
 void processInput(GLFWwindow* window);
@@ -50,7 +53,6 @@ int main(int, char**) {
         設定 viewport。
     */
     glViewport(0, 0, 800, 600);
-
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     
     /* 
@@ -66,6 +68,37 @@ int main(int, char**) {
     glGenBuffers(1, &VBO); // generate vbo buffer id via opengl.
     glBindBuffer(GL_ARRAY_BUFFER, VBO); // binding VBO to GL_ARRAY_BUFFER.
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    /*
+        read vertces shader.
+    */
+    std::ifstream file(SOURCE_DIR "shader.vert");
+    if (!file.is_open()) {
+        std::cerr << "Shader 檔案無法開啟" << std::endl;
+        return -1;
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    std::string shader_str = buffer.str();
+    const char* vertexShaderSource = shader_str.c_str();
+
+    /*
+        create and compile shader.
+    */
+    unsigned int vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+    
+    int success;
+    char infoLog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
     
     /* 
         開始 loop to rendering
