@@ -13,6 +13,7 @@
 			"add_executable",
 			"target_link_libraries",
 			"add_compile_options",
+			"add_compile_definitions",
 			"target_include_directories"
 		],
 		"files" : 
@@ -27,31 +28,37 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 14,
+				"line" : 16,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 22,
+				"line" : 24,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 25,
+				"line" : 27,
 				"parent" : 0
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 13,
+				"line" : 15,
 				"parent" : 0
 			},
 			{
 				"command" : 3,
 				"file" : 0,
-				"line" : 16,
+				"line" : 13,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 18,
 				"parent" : 0
 			}
 		]
@@ -73,10 +80,17 @@
 					"fragment" : "-g"
 				}
 			],
-			"includes" : 
+			"defines" : 
 			[
 				{
 					"backtrace" : 5,
+					"define" : "SOURCE_DIR=\"/Users/chenshiang/Desktop/dev/opengl-tutorial/src\""
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 6,
 					"path" : "/Users/chenshiang/Desktop/dev/opengl-tutorial/include"
 				}
 			],
@@ -101,10 +115,17 @@
 					"fragment" : "-g"
 				}
 			],
-			"includes" : 
+			"defines" : 
 			[
 				{
 					"backtrace" : 5,
+					"define" : "SOURCE_DIR=\"/Users/chenshiang/Desktop/dev/opengl-tutorial/src\""
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 6,
 					"path" : "/Users/chenshiang/Desktop/dev/opengl-tutorial/include"
 				}
 			],

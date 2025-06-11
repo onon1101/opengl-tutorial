@@ -54,7 +54,21 @@ int main(int, char**) {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     
     /* 
-    開始 loop to rendering
+        設定 vertices。
+    */
+    float vertices[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f
+    };
+
+    unsigned int VBO; // or GLuint. declare the value of the buffer id.
+    glGenBuffers(1, &VBO); // generate vbo buffer id via opengl.
+    glBindBuffer(GL_ARRAY_BUFFER, VBO); // binding VBO to GL_ARRAY_BUFFER.
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    
+    /* 
+        開始 loop to rendering
     */
     while(!glfwWindowShouldClose(window)) {
         // input

@@ -1,6 +1,7 @@
 # ninja log v6
-0	95	1748934882299755265	CMakeFiles/OpenGL_Tutorial.dir/src/glad.c.o	fbed9e69f23decc2
-18	565	1749028889161173531	CMakeFiles/OpenGL_Tutorial.dir/src/main.cpp.o	f62a930538b1ee65
-565	743	1749028889708420972	OpenGL_Tutorial	e851dd6c66a37003
-6	535	1749542813061177602	CMakeFiles/OpenGL_Tutorial.dir/src/main.cpp.o	f62a930538b1ee65
-535	748	1749542813589865129	OpenGL_Tutorial	e851dd6c66a37003
+8	397	1749620642122389311	CMakeFiles/OpenGL_Tutorial.dir/src/glad.c.o	fbed9e69f23decc2
+13	581	1749620662548499967	CMakeFiles/OpenGL_Tutorial.dir/src/main.cpp.o	f62a930538b1ee65
+581	750	1749620663116966257	OpenGL_Tutorial	e851dd6c66a37003
+8	285	1749622953152202269	CMakeFiles/OpenGL_Tutorial.dir/src/glad.c.o	f6b1e24ff7f8dc1b
+8	649	1749622953152574270	CMakeFiles/OpenGL_Tutorial.dir/src/main.cpp.o	10dd2f0d31ca21a3
+650	916	1749622953793834768	OpenGL_Tutorial	e851dd6c66a37003
