@@ -52,7 +52,10 @@ int main(int, char**) {
     /*
         設定 viewport。
     */
-    glViewport(0, 0, 800, 600);
+    int fbWidth, fbHeight;
+    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    glViewport(0, 0, fbWidth, fbHeight);
+    // glViewport(0, 0, 800, 600);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     
     /* 
@@ -161,8 +164,8 @@ int main(int, char**) {
     return 0;
 }
 
-void framebuffer_size_callback(GLFWwindow* window, int witdh, int height) {
-    glViewport(0, 0, witdh, height);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
 }
 
 void processInput(GLFWwindow *window) {
