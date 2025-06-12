@@ -1,3 +1,0 @@
-/Users/chenshiang/Desktop/dev/opengl-tutorial/build/CMakeFiles/OpenGL_Tutorial.dir
-/Users/chenshiang/Desktop/dev/opengl-tutorial/build/CMakeFiles/edit_cache.dir
-/Users/chenshiang/Desktop/dev/opengl-tutorial/build/CMakeFiles/rebuild_cache.dir
