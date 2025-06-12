@@ -6,7 +6,17 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(CMAKE_COLOR_DIAGNOSTICS ON)
-# add_compile_options(-fdiagnostics-color=always -Wall -g)
+
+
+include(FetchContent)
+
+FetchContent_Declare(
+	glm
+	GIT_REPOSITORY	https://github.com/g-truc/glm.git
+	GIT_TAG 	bf71a834948186f4097caa076cd2663c69a10e1e #refs/tags/1.0.1
+)
+
+FetchContent_MakeAvailable(glm)
 
 file(GLOB_RECURSE SOURCES src/*.cpp src/*.c)
 
@@ -17,11 +27,15 @@ add_executable(OpenGL_Tutorial ${SOURCES})
 
 target_include_directories(OpenGL_Tutorial PRIVATE
     ${CMAKE_SOURCE_DIR}/include
+    $ENV{VULKAN_SDK}/include
 )
 
 find_library(GLFW_LIB glfw3 HINTS ${CMAKE_SOURCE_DIR}/lib REQUIRED)
+find_library(VULKAN_LIB vulkan HINTS $ENV{VULKAN_SDK}/lib REQUIRED)
 
-target_link_libraries(OpenGL_Tutorial PRIVATE ${GLFW_LIB})
+target_link_libraries(OpenGL_Tutorial PRIVATE ${GLFW_LIB} ${VULKAN_LIB} glm::glm)
+# include_directories($ENV{VULKAN_SDK}/include)
+# link_directories($ENV{VULKAN_SDK}/lib)
 
 if (APPLE)
     target_link_libraries(OpenGL_Tutorial PRIVATE
