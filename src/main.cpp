@@ -56,7 +56,7 @@ int main(int, char**) {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     
     /* 
-        設定 vertices。
+        設定 vertices and vertex attribute。
     */
     float vertices[] = {
         -0.5f, -0.5f, 0.0f,
@@ -65,9 +65,13 @@ int main(int, char**) {
     };
 
     unsigned int VBO; // or GLuint. declare the value of the buffer id.
+    unsigned int VAO; // declare vertex attribute object.
     glGenBuffers(1, &VBO); // generate vbo buffer id via opengl.
+    glGenVertexArrays(1, &VAO); // just like vbo
     glBindBuffer(GL_ARRAY_BUFFER, VBO); // binding VBO to GL_ARRAY_BUFFER.
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindVertexArray(VAO); // binding 
 
     /*
         read vertces shader.
@@ -99,7 +103,41 @@ int main(int, char**) {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
-    
+
+    /*
+        read, create and compile fragment shader.
+    */
+    std::ifstream file02(SOURCE_DIR "shader.frag");
+    std::stringstream buffer02;
+    buffer02 << file02.rdbuf();
+    std::string shader_str02 = buffer02.str();
+    const char* fragmentShaderSource = shader_str02.c_str();
+    unsigned int fragmentShader;
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+
+    /*
+        create shader program.
+    */
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    /* 
+        delete vertex and fragment shader
+    */
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    /*
+        linking vertex attr.
+    */
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 *sizeof(float),(void*)0);
+    glEnableVertexAttribArray(0);
+
     /* 
         開始 loop to rendering
     */
@@ -110,6 +148,10 @@ int main(int, char**) {
         //rendering
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // checking        
         glfwSwapBuffers(window);
