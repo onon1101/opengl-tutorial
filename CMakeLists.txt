@@ -11,6 +11,7 @@ set(CMAKE_COLOR_DIAGNOSTICS ON)
 file(GLOB_RECURSE SOURCES src/*.cpp src/*.c)
 
 add_compile_definitions(SOURCE_DIR=\"${CMAKE_SOURCE_DIR}/src/\")
+add_compile_definitions(ASSETS_DIR=\"${CMAKE_SOURCE_DIR}/assets/\")
 
 add_compile_options(-Wall -g)
 add_executable(OpenGL_Tutorial ${SOURCES})
