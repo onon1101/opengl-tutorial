@@ -1,5 +1,5 @@
 /*
-GLFW 會用到 opengl 的東西，因此需要先導入 glad。
+    GLFW 會用到 opengl 的東西，因此需要先導入 glad。
 */
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -66,7 +66,7 @@ int main(int, char**) {
         -0.5f, -0.5f, 0.0f,  // bottom left
         -0.5f,  0.5f, 0.0f   // top left 
 
-/*
+    /*
         // first triangle
         0.5f,  0.5f, 0.0f,  // top right
         0.5f, -0.5f, 0.0f,  // bottom right
@@ -75,7 +75,7 @@ int main(int, char**) {
         0.5f, -0.5f, 0.0f,  // bottom right
         -0.5f, 0.5f, 0.0f,  // bottom left
         -0.5f, -0.5f, 0.0f   // top left
-*/
+    */
     };
 
     int indices[] = {
@@ -91,7 +91,7 @@ int main(int, char**) {
     glGenBuffers(1, &EBO);
     
     glBindVertexArray(VAO); // binding 
-    
+
     glBindBuffer(GL_ARRAY_BUFFER, VBO); // binding VBO to GL_ARRAY_BUFFER.
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);

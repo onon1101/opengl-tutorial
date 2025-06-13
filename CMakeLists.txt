@@ -28,7 +28,6 @@ if (APPLE)
         "-framework Cocoa"
         "-framework IOKit"
         "-framework CoreFoundation"
-        "-framework CoreVideo"
         "-framework OpenGL"
     )
 endif()
