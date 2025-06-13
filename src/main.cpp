@@ -61,9 +61,10 @@ int main(int, char**) {
         設定 vertices buffer and vertex attribute。
     */
     float vertices[] = {
-        0.0f,  0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
+        // position                         // color
+        0.0f,  0.5f, 0.0f,      1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.0f,      0.0f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
     };
 
     unsigned int VBO; // or GLuint. declare the value of the buffer id.
@@ -143,8 +144,11 @@ int main(int, char**) {
     /*
         linking vertex attr.
     */
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 *sizeof(float),(void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 *sizeof(float),(void*)0);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     /* 
         開始 loop to rendering
