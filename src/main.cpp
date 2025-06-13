@@ -61,41 +61,24 @@ int main(int, char**) {
         設定 vertices buffer and vertex attribute。
     */
     float vertices[] = {
-        0.5f,  0.5f, 0.0f,
+        0.0f,  0.5f, 0.0f,
         0.5f, -0.5f, 0.0f,  // bottom right
         -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
-
-    /*
-        // first triangle
-        0.5f,  0.5f, 0.0f,  // top right
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f,  0.5f, 0.0f,  // top left 
-        // second triangle
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, 0.5f, 0.0f,  // bottom left
-        -0.5f, -0.5f, 0.0f   // top left
-    */
-    };
-
-    int indices[] = {
-        0, 1, 3,
-        1, 2, 3
     };
 
     unsigned int VBO; // or GLuint. declare the value of the buffer id.
     unsigned int VAO; // declare vertex attribute object.
-    unsigned int EBO;
+    // unsigned int EBO;
     glGenVertexArrays(1, &VAO); // just like vbo
     glGenBuffers(1, &VBO); // generate vbo buffer id via opengl.
-    glGenBuffers(1, &EBO);
+    // glGenBuffers(1, &EBO);
     
     glBindVertexArray(VAO); // binding 
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO); // binding VBO to GL_ARRAY_BUFFER.
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 
     /*
@@ -184,7 +167,7 @@ int main(int, char**) {
         
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f); 
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // checking        
         glfwSwapBuffers(window);
