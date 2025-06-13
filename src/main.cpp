@@ -55,7 +55,6 @@ int main(int, char**) {
     int fbWidth, fbHeight;
     glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
     glViewport(0, 0, fbWidth, fbHeight);
-    // glViewport(0, 0, 800, 600);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     
     /* 
@@ -172,10 +171,18 @@ int main(int, char**) {
         processInput(window);
 
         //rendering
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // background
         glClear(GL_COLOR_BUFFER_BIT);
 
+        // triangle
         glUseProgram(shaderProgram);
+        
+        float timeValue = glfwGetTime();
+        float greenValue = (sin(timeValue) /2.0f) + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+        
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f); 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
