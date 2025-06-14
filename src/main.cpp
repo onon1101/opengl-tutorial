@@ -80,7 +80,7 @@ main(int, char **)
 	*/
 	int width, height, nrChannels;
 	unsigned char *data =
-		stbi_load(ASSETS_DIR "container.jpg", &width, &height, &nrChannels, 0);
+		stbi_load(ASSETS_DIR "wall.jpg", &width, &height, &nrChannels, 0);
 
 	unsigned int texture;
 	glGenTextures(1, &texture);
@@ -111,33 +111,33 @@ main(int, char **)
 	// clang-format off
 	float vertices[] = {
     // positions          // colors           // texture coords
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+     0.0f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
      0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
     -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+    // -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
 	};
 
-	unsigned int indices[] = {
-		0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
-	};
+	// unsigned int indices[] = {
+	// 	0, 1, 3, // first triangle
+    //     1, 2, 3  // second triangle
+	// };
 
 	// clang-format on
 	unsigned int VBO; // or GLuint. declare the value of the buffer id.
 	unsigned int VAO; // declare vertex attribute object.
-	unsigned int EBO;
+	// unsigned int EBO;
 	glGenVertexArrays(1, &VAO); // just like vbo
 	glGenBuffers(1, &VBO);		// generate vbo buffer id via opengl.
-	glGenBuffers(1, &EBO);
+	// glGenBuffers(1, &EBO);
 
 	glBindVertexArray(VAO); // binding
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO); // binding VBO to GL_ARRAY_BUFFER.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-				 GL_STATIC_DRAW);
+	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	// glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+	// 			 GL_STATIC_DRAW);
 
 	/*
 		linking vertex attr.
@@ -173,7 +173,8 @@ main(int, char **)
 
 		// uniform
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		// checking
 		glfwSwapBuffers(window);
