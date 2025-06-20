@@ -1,49 +1,43 @@
-/*
-	GLFW 會用到 opengl 的東西，因此需要先導入 glad。
-*/
 // clang-format off
+#include <cstdlib>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 // clang-format on
 
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#include "Shader.hpp"
+const GLuint HEIGHT = 600;
+const GLuint WIDTH = 800;
+
+// Callback function for window resize events
+void
+framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
 void
-framebuffer_size_callback(GLFWwindow *window, int witdh, int height);
-void
-processInput(GLFWwindow *window);
-
+checkCompileError(GLuint shader, const char *type);
 int
 main(int, char **)
 {
 
-	/*
-		設定 glfw
-	   GLFW_CONTEXT_VERSION_MAJOR: 設定版本 3
-	   GLFW_OPENGL_PROFILE: without backwards-compatible features
-	*/
+	// settings and initialize glfw.
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_CORE_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 #ifdef __APPLE__
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-	/*
-		設定與啟動 window
-	*/
-
-	GLFWwindow *window = glfwCreateWindow(800, 600, "LearnOpengl", NULL, NULL);
+	// create window.
+	GLFWwindow *window =
+		glfwCreateWindow(WIDTH, HEIGHT, "LearningOpenGL", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -52,74 +46,112 @@ main(int, char **)
 	}
 	glfwMakeContextCurrent(window);
 
-	/*
-		使用 glad 管理 opengl pointer。
-	*/
-
+	// use glad to manage opengl pointer.
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
 
-	/*
-		設定 viewport。
-	*/
+	// settings viewport.
 	int fbWidth, fbHeight;
 	glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 	glViewport(0, 0, fbWidth, fbHeight);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	/*
-		設定 shader.
-	*/
-	Shader shaderProgram(SOURCE_DIR "shader.vert", SOURCE_DIR "shader.frag");
+	// read shader file.
+	const char *vertexShaderPath = SOURCE_DIR "shader.vert";
+	const char *fragmentShaderPath = SOURCE_DIR "shader.frag";
 
-	/*
-		load image and generating texture
-	*/
-	int width, height, nrChannels;
-	unsigned char *data =
-		stbi_load(ASSETS_DIR "container.jpg", &width, &height, &nrChannels, 0);
+	std::ifstream vertexShaderFile;
+	std::ifstream fragmentShaderFile;
 
-	unsigned int texture;
+	vertexShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	fragmentShaderFile.exceptions(std::ifstream::failbit |
+								  std::ifstream::badbit);
+
+	vertexShaderFile.open(vertexShaderPath);
+	fragmentShaderFile.open(fragmentShaderPath);
+
+	std::stringstream vertexShaderStream;
+	std::stringstream fragmentShaderStream;
+
+	vertexShaderStream << vertexShaderFile.rdbuf();
+	fragmentShaderStream << fragmentShaderFile.rdbuf();
+
+	vertexShaderFile.close();
+	fragmentShaderFile.close();
+
+	std::string vertexCode = vertexShaderStream.str();
+	std::string fragmentCode = fragmentShaderStream.str();
+
+	const char *vertexShaderCode = vertexCode.c_str();
+	const char *fragmentShaderCode = fragmentCode.c_str();
+
+	// create shader file in opengl.
+	GLuint vertex;
+	GLuint fragment;
+
+	vertex = glCreateShader(GL_VERTEX_SHADER); // create vertex shader.
+	glShaderSource(vertex, 1, &vertexShaderCode, NULL);
+	glCompileShader(vertex);
+	checkCompileError(vertex, "VERTEX");
+
+	fragment = glCreateShader(GL_FRAGMENT_SHADER); // create fragment shader.
+	glShaderSource(fragment, 1, &fragmentShaderCode, NULL);
+	glCompileShader(fragment);
+	checkCompileError(fragment, "FRAGMENT");
+
+	GLuint shaderProgramID; // create shader program.
+	shaderProgramID = glCreateProgram();
+	glAttachShader(shaderProgramID, vertex);
+	glAttachShader(shaderProgramID, fragment);
+	glLinkProgram(shaderProgramID);
+	checkCompileError(shaderProgramID, "PROGRAM");
+
+	glDeleteShader(vertex);
+	glDeleteShader(fragment);
+
+	stbi_set_flip_vertically_on_load(true);
+
+	int imageWidth, imageHeight, nrChannels;
+	unsigned char *data = stbi_load(ASSETS_DIR "image.jpg", &imageWidth,
+									&imageHeight, &nrChannels, 0);
+
+	// texture
+	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	// config
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 					GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
 	if (data)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-					 GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight, 0,
+					 GL_RGB, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 	{
 		std::cout << "Failed to load texture" << std::endl;
 	}
-
 	stbi_image_free(data);
 
-	/*
-		設定 vertices buffer and vertex attribute。
-	*/
-	// clang-format off
+	// VAO, VBO, EBO
 	float vertices[] = {
-    // positions          // colors           // texture coords
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+		// positions          // colors           // texture coords
+		0.2f,  0.2f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
+		0.2f,  -0.2f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+		-0.2f, -0.2f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
+		-0.2f, 0.2f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left
 	};
 
 	unsigned int indices[] = {
 		0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
+		1, 2, 3	 // second triangle
 	};
 
 	// clang-format on
@@ -154,24 +186,45 @@ main(int, char **)
 						  (void *)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	glUniform1i(glGetUniformLocation(shaderProgram.ID, "ourTexture"), 0);
+	glUniform1i(glGetUniformLocation(shaderProgramID, "ourTexture"), 0);
 
-	/*
-		開始 loop to rendering
-	*/
+	float posX = 0.0f, posY = 0.0f;
+	float speedX = ((float)rand() / RAND_MAX - 0.5f) * 0.02f;
+	float speedY = ((float)rand() / RAND_MAX - 0.5f) * 0.02f;
+
 	while (!glfwWindowShouldClose(window))
 	{
-		// input
-		processInput(window);
+		// polling key input
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		{
+			glfwSetWindowShouldClose(window, true);
+		}
 
 		// rendering
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // background
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		// triangle
-		shaderProgram.use();
+		glUseProgram(shaderProgramID);
 
-		// uniform
+		posX += speedX;
+		posY += speedY;
+
+		if (posX >= 1.0f - 0.2f || posX <= -1.0f + 0.2f)
+		{
+			speedX *= -1;
+			float jitter = ((float)rand() / RAND_MAX - 0.5f) * 0.02f; // ±0.01
+			speedY += jitter;
+		}
+		if (posY > 1.0f - 0.2f || posY < -1.0f + 0.2f)
+		{
+			speedY *= -1;
+			float jitter = ((float)rand() / RAND_MAX - 0.5f) * 0.02f;
+			speedX += jitter;
+		}
+
+		glUniform2f(glad_glGetUniformLocation(shaderProgramID, "movePos"), posX,
+					posY);
+
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -179,6 +232,12 @@ main(int, char **)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+	// erase data.
+	glDeleteProgram(shaderProgramID);
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 	glfwTerminate();
 	return 0;
 }
@@ -190,10 +249,36 @@ framebuffer_size_callback(GLFWwindow *window, int width, int height)
 }
 
 void
-processInput(GLFWwindow *window)
+checkCompileError(GLuint shader, const char *type)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	int success;
+	char infoLog[1024];
+	if (type != "PROGRAM")
 	{
-		glfwSetWindowShouldClose(window, true);
+		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+		if (!success)
+		{
+			glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+			std::cout
+				<< "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n"
+				<< infoLog
+				<< "\n -- --------------------------------------------------- "
+				   "-- "
+				<< std::endl;
+		}
+	}
+	else
+	{
+		glGetProgramiv(shader, GL_LINK_STATUS, &success);
+		if (!success)
+		{
+			glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+			std::cout
+				<< "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n"
+				<< infoLog
+				<< "\n -- --------------------------------------------------- "
+				   "-- "
+				<< std::endl;
+		}
 	}
 }
