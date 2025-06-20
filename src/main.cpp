@@ -2,9 +2,14 @@
 	GLFW 會用到 opengl 的東西，因此需要先導入 glad。
 */
 // clang-format off
+#include "glm/fwd.hpp"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 // clang-format on
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -168,8 +173,15 @@ main(int, char **)
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // background
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		// create transformations
+		glm::mat4 transform = glm::mat4(1.0f);
+		transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+		transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0));
+
 		// triangle
 		shaderProgram.use();
+		GLuint transformLoc = glGetUniformLocation(shaderProgram.ID, "transform");
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 
 		// uniform
 		glBindVertexArray(VAO);
