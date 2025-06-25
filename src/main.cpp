@@ -2,7 +2,9 @@
 	GLFW 會用到 opengl 的東西，因此需要先導入 glad。
 */
 // clang-format off
+#include "glm/ext/matrix_clip_space.hpp"
 #include "glm/fwd.hpp"
+#include "glm/trigonometric.hpp"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 // clang-format on
@@ -89,6 +91,7 @@ main(int, char **)
 	glBindTexture(GL_TEXTURE_2D, texture0);
 
 	int width, height, nrChannels;
+	stbi_set_flip_vertically_on_load(true);
 	unsigned char *data =
 		stbi_load(ASSETS_DIR "container.jpg", &width, &height, &nrChannels, 0);
 
@@ -207,18 +210,25 @@ main(int, char **)
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture1);
 
-		// create transformations
-		glm::mat4 transform = glm::mat4(1.0f);
-		transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-		transform = glm::rotate(transform, (float)glfwGetTime(),
-								glm::vec3(0.0f, 0.0f, 1.0));
-
-		// triangle
+		// activate shader 
 		shaderProgram.use();
-		GLuint transformLoc =
-			glGetUniformLocation(shaderProgram.ID, "transform");
-		glUniformMatrix4fv(transformLoc, 1, GL_FALSE,
-						   glm::value_ptr(transform));
+
+		// create coordinate system
+		glm::mat4 model = glm::mat4(1.0f); // model matrix: object space -> world space
+		model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+ 
+		glm::mat4 view = glm::mat4(1.0f); // view matrix: world space -> view space.
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+		glm::mat4 projection = glm::mat4(1.0f); // projection matrix: view space -> clip space.
+		projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+		GLuint modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		GLuint viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+
+		shaderProgram.setMat4("projection", projection);
 
 		// uniform
 		glBindVertexArray(VAO);
