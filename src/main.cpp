@@ -83,19 +83,14 @@ main(int, char **)
 	/*
 		load image and generating texture
 	*/
+
+	unsigned int texture0, texture1;
+	glGenTextures(1, &texture0);
+	glBindTexture(GL_TEXTURE_2D, texture0);
+
 	int width, height, nrChannels;
 	unsigned char *data =
 		stbi_load(ASSETS_DIR "container.jpg", &width, &height, &nrChannels, 0);
-
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	// config
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-					GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	if (data)
 	{
@@ -107,6 +102,37 @@ main(int, char **)
 	{
 		std::cout << "Failed to load texture" << std::endl;
 	}
+
+	// config
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+					GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	stbi_image_free(data);
+
+	glGenTextures(1, &texture1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+
+	data = stbi_load(ASSETS_DIR "awesomeface.jpg", &width, &height, &nrChannels,
+					 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+					 GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+					GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	stbi_image_free(data);
 
@@ -159,7 +185,9 @@ main(int, char **)
 						  (void *)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	glUniform1i(glGetUniformLocation(shaderProgram.ID, "ourTexture"), 0);
+	shaderProgram.use();
+	glUniform1i(glGetUniformLocation(shaderProgram.ID, "texture0"), 0);
+	shaderProgram.setInt("texture1", 1);
 
 	/*
 		開始 loop to rendering
@@ -173,15 +201,24 @@ main(int, char **)
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // background
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		// binding texture
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture0);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture1);
+
 		// create transformations
 		glm::mat4 transform = glm::mat4(1.0f);
 		transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-		transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0));
+		transform = glm::rotate(transform, (float)glfwGetTime(),
+								glm::vec3(0.0f, 0.0f, 1.0));
 
 		// triangle
 		shaderProgram.use();
-		GLuint transformLoc = glGetUniformLocation(shaderProgram.ID, "transform");
-		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+		GLuint transformLoc =
+			glGetUniformLocation(shaderProgram.ID, "transform");
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE,
+						   glm::value_ptr(transform));
 
 		// uniform
 		glBindVertexArray(VAO);
