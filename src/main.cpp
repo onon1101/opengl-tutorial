@@ -26,18 +26,29 @@
 
 #include "Shader.hpp"
 
-
+// some settings for camera space
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
+// for calcuating the delat time.
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+bool firstMouse = true;
+float yaw = -90.0f;
+float pitch = 0.0f;
+float lastX = 400, lastY = 300;
+float fov = 45.0f;
 
 void
 framebuffer_size_callback(GLFWwindow *window, int witdh, int height);
 void
 processInput(GLFWwindow *window);
+void
+mouse_callback(GLFWwindow *window, double xpos, double ypos);
+void
+scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
 int
 main(int, char **)
@@ -89,6 +100,9 @@ main(int, char **)
 	glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 	glViewport(0, 0, fbWidth, fbHeight);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+	// settings mouse cursor that stays within the center of the window.
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	/*
 		設定 shader.
@@ -256,8 +270,15 @@ main(int, char **)
 	*/
 	while (!glfwWindowShouldClose(window))
 	{
-		// input
+		// calcuate the deltatime that keep each generate speed uniformly.
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+		// polling input I/O device.
 		processInput(window);
+		glfwSetCursorPosCallback(window, mouse_callback);
+		glfwSetScrollCallback(window, scroll_callback);
 
 		// rendering
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // background
@@ -272,14 +293,15 @@ main(int, char **)
 		// activate shader
 		shaderProgram.use();
 
-		// create coordinate system
+		//
 
+		// create coordinate system
 		glm::mat4 view; // view matrix: world space -> view space.
 		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		glm::mat4 projection =
 			glm::mat4(1.0f); // projection matrix: view space -> clip space.
-		projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f,
+		projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f,
 									  0.1f, 100.0f);
 		shaderProgram.setMat4("projection", projection);
 		shaderProgram.setMat4("view", view);
@@ -312,19 +334,64 @@ framebuffer_size_callback(GLFWwindow *window, int width, int height)
 void
 processInput(GLFWwindow *window)
 {
-	const float cameraSpeed = 0.05f;
+	const float cameraSpeed = 2.5f * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		cameraPos += cameraSpeed * cameraFront;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		cameraPos -= cameraSpeed * cameraFront;
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		cameraPos -=
+			glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		cameraPos +=
+			glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+}
 
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		{
-			glfwSetWindowShouldClose(window, true);
-		}
+void
+mouse_callback(GLFWwindow *window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos;
+
+	lastX = xpos;
+	lastY = ypos;
+
+	const float sensitivity = 0.1f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront = glm::normalize(direction);
+}
+void
+scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
+{
+	fov -= (float)yoffset;
+	if (fov < 1.0f)
+		fov = 1.0f;
+	if (fov > 45.0f)
+		fov = 45.0f;
 }
