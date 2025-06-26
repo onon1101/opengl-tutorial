@@ -6,6 +6,7 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/quaternion_transform.hpp"
 #include "glm/fwd.hpp"
+#include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -24,6 +25,14 @@
 #include "stb_image.h"
 
 #include "Shader.hpp"
+
+
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
 void
 framebuffer_size_callback(GLFWwindow *window, int witdh, int height);
@@ -264,15 +273,9 @@ main(int, char **)
 		shaderProgram.use();
 
 		// create coordinate system
-		const float radius = 10.0f;
-		float camX = sin(glfwGetTime()) * radius;
-		float camZ = cos(glfwGetTime()) * radius;
-		glm::mat4 view;// view matrix: world space -> view space.
-		view = glm::lookAt(
-			glm::vec3(camX, 0.0f, camZ),
-			glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3(0.0f, 1.0f, 0.0f)
-		);
+
+		glm::mat4 view; // view matrix: world space -> view space.
+		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		glm::mat4 projection =
 			glm::mat4(1.0f); // projection matrix: view space -> clip space.
@@ -286,11 +289,10 @@ main(int, char **)
 		{
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, cubePositions[i]);
-			model = glm::rotate(
-				model, glm::radians(-55.0f),
-				glm::vec3(1.0f, -1.0f, 0.0f));
+			model = glm::rotate(model, glm::radians(-55.0f),
+								glm::vec3(1.0f, -1.0f, 0.0f));
 			shaderProgram.setMat4("model", model);
-			glDrawArrays(GL_TRIANGLES, 0, 36); //rendering
+			glDrawArrays(GL_TRIANGLES, 0, 36); // rendering
 		}
 
 		// checking
@@ -310,8 +312,19 @@ framebuffer_size_callback(GLFWwindow *window, int width, int height)
 void
 processInput(GLFWwindow *window)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-	{
-		glfwSetWindowShouldClose(window, true);
-	}
+	const float cameraSpeed = 0.05f;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPos += cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPos -= cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+
+
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		{
+			glfwSetWindowShouldClose(window, true);
+		}
 }
