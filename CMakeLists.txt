@@ -10,6 +10,15 @@ set(CMAKE_COLOR_DIAGNOSTICS ON)
 
 file(GLOB_RECURSE SOURCES src/*.cpp src/*.c)
 
+# --- spdlog install and setup ---
+include(FetchContent)
+FetchContent_Declare(
+    spdlog
+    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+    GIT_TAG v1.13.0
+)
+FetchContent_MakeAvailable(spdlog)
+
 add_compile_definitions(SOURCE_DIR=\"${CMAKE_SOURCE_DIR}/src/\")
 add_compile_definitions(ASSETS_DIR=\"${CMAKE_SOURCE_DIR}/assets/\")
 
@@ -23,6 +32,7 @@ target_include_directories(OpenGL_Tutorial PRIVATE
 find_library(GLFW_LIB glfw3 HINTS ${CMAKE_SOURCE_DIR}/lib REQUIRED)
 
 target_link_libraries(OpenGL_Tutorial PRIVATE ${GLFW_LIB})
+target_link_libraries(OpenGL_Tutorial PRIVATE spdlog::spdlog)
 
 if (APPLE)
     target_link_libraries(OpenGL_Tutorial PRIVATE
